@@ -1,0 +1,684 @@
+/* ========== 页面容器 ========== */
+.parse-page {
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    padding: 16px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.parse-container {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ========== 头部 ========== */
+.parse-header {
+    padding: 0 4px;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.parse-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 2px;
+}
+
+.parse-header p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.header-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.header-action {
+    margin-left: auto;
+}
+
+/* ========== 图标按钮 ========== */
+.icon-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: var(--color-text-secondary);
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.icon-btn:hover {
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+}
+
+.icon-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ========== 表单卡片 ========== */
+.parse-card {
+    background-color: var(--color-card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ========== 表单标签 ========== */
+.form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-top: 6px;
+}
+
+/* ========== 输入框通用样式 ========== */
+.form-input,
+.form-select,
+.form-textarea {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    background-color: var(--color-card);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-ring);
+}
+
+.form-textarea {
+    min-height: unset;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+/* ========== 自定义下拉菜单 ========== */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.dropdown-trigger:hover {
+    border-color: var(--color-primary);
+}
+
+.dropdown-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-arrow {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--color-text-secondary);
+    transition: transform 0.2s;
+}
+
+.dropdown-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dropdown-icon svg,
+.dropdown-icon img {
+    width: 18px;
+    height: 18px;
+}
+
+.platform-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    list-style: none;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06);
+    padding: 4px;
+    overflow: hidden;
+    animation: dropdownIn 0.15s ease-out;
+}
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    font-size: 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: background-color 0.1s;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color-input-bg);
+}
+
+.dropdown-item.active {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.dropdown-item.active .dropdown-icon {
+    color: var(--color-primary);
+}
+
+/* ========== 选项行（平台 + 音质 + 按钮） ========== */
+.form-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.quality-col {
+    min-width: 200px;
+}
+
+.form-row-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.path-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 10px;
+    padding: 6px 6px 6px 12px;
+}
+
+.path-display {
+    flex: 1;
+    font-size: 13px;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+/* ========== 请求预览栏 ========== */
+.preview-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--color-primary-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--color-primary-text);
+}
+
+.preview-bar svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.preview-content {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.preview-content code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+}
+
+/* ========== 错误信息 ========== */
+.error-msg {
+    font-size: 12px;
+    color: var(--color-danger);
+}
+
+/* ========== 按钮样式 ========== */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--color-input-border);
+    transition: all 0.15s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-border);
+}
+
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    transition: all 0.15s;
+}
+
+.btn-ghost:hover {
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+}
+
+.btn-sm {
+    font-size: 13px;
+    padding: 7px 14px;
+}
+
+/* ========== 加载旋转动画 ========== */
+.spinner {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    margin-left: -4px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========== 结果展示 ========== */
+.result-wrapper {
+    animation: fadeSlideIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== 音乐卡片 ========== */
+.music-card {
+    background-color: var(--color-card);
+    border-radius: 16px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.music-card-body {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+}
+
+.music-cover {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background-color: var(--color-input-bg);
+}
+
+.music-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.music-title {
+    font-size: 15px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.music-artist {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.music-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.meta-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: var(--color-input-bg);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.meta-warn {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.music-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px 16px;
+    flex-wrap: wrap;
+}
+
+.download-msg {
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.msg-success {
+    color: var(--color-success-text);
+}
+
+.msg-error {
+    color: var(--color-danger);
+}
+
+.music-card .result-json {
+    border-top: 1px solid var(--color-divider);
+}
+
+/* ========== JSON 结果 ========== */
+.result-json {
+    margin: 0;
+    padding: 16px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    overflow: auto;
+    white-space: pre;
+    background-color: var(--color-input-bg);
+}
+
+.result-json::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.result-json::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.result-json::-webkit-scrollbar-thumb {
+    background: var(--color-input-border);
+    border-radius: 3px;
+}
+
+.result-json::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
+}
+
+/* ========== 平台按钮组 ========== */
+.platform-group {
+    display: flex;
+    gap: 8px;
+}
+
+.platform-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 10px;
+    transition: all 0.15s;
+    position: relative;
+}
+
+.platform-btn:hover:not(.disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.platform-btn.active {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.platform-btn.disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+.platform-btn.disabled.active {
+    opacity: 1;
+}
+
+.platform-btn .platform-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.auto-badge-inline {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+    white-space: nowrap;
+}
+
+/* ========== 历史记录列表 ========== */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.history-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.history-time-label {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    padding-left: 4px;
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+/* ========== 页脚 ========== */
+.parse-footer {
+    text-align: center;
+    padding: 12px 0;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.parse-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.parse-footer a:hover {
+    text-decoration: underline;
+}
+
+.footer-sep {
+    margin: 0 6px;
+    opacity: 0.5;
+}

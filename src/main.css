@@ -1,0 +1,80 @@
+/* ========== CSS Reset ========== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+* {
+  font-family: cascadia code, 汉仪有圆, 喵字果汁体, 霞鹜文楷, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font-size: inherit;
+  line-height: inherit;
+  border: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+}
+
+/* ========== 全局 CSS 变量 ========== */
+:root {
+  --color-bg: #f8f9fa;
+  --color-text: #1a1a2e;
+  --color-text-secondary: #94a3b8;
+  --color-card: #ffffff;
+  --color-input-bg: #f1f5f9;
+  --color-border: rgba(15, 23, 42, 0.06);
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-light: rgba(79, 70, 229, 0.06);
+  --color-primary-text: #4338ca;
+  --color-danger: #ef4444;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-success-text: #059669;
+  --color-ring: rgba(79, 70, 229, 0.25);
+  --color-input-border: #e2e8f0;
+  --color-divider: #f1f5f9;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0f0f0f;
+    --color-text: #e2e8f0;
+    --color-text-secondary: #64748b;
+    --color-card: #1c1c1c;
+    --color-input-bg: rgba(255, 255, 255, 0.05);
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-primary: #6366f1;
+    --color-primary-hover: #818cf8;
+    --color-primary-light: rgba(99, 102, 241, 0.12);
+    --color-primary-text: #a5b4fc;
+    --color-danger: #f87171;
+    --color-success-bg: rgba(16, 185, 129, 0.12);
+    --color-success-text: #34d399;
+    --color-ring: rgba(99, 102, 241, 0.35);
+    --color-input-border: rgba(255, 255, 255, 0.1);
+    --color-divider: rgba(255, 255, 255, 0.06);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
