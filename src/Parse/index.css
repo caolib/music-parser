@@ -456,12 +456,41 @@
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-card);
     overflow: hidden;
+    position: relative;
 }
 
 .music-card-body {
     display: flex;
     gap: 16px;
     padding: 16px;
+    flex-wrap: wrap;
+}
+
+/* ========== 卡片顶部标签（平台+时间） ========== */
+.card-top-tags {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1;
+}
+
+.card-platform-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-text);
+    white-space: nowrap;
+}
+
+.card-time-tag {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
 }
 
 .music-cover {
@@ -488,6 +517,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.music-title-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    display: block;
+}
+
+.music-title-link:hover {
+    text-decoration: underline;
 }
 
 .music-artist {
@@ -634,6 +673,79 @@
     white-space: nowrap;
 }
 
+/* ========== 下载状态标签 ========== */
+.download-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.status-tag {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.status-done {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+}
+
+.status-pending {
+    background-color: var(--color-input-bg);
+    color: var(--color-text-secondary);
+}
+
+/* ========== 已下载按钮样式 ========== */
+.btn-done {
+    background-color: var(--color-success-bg);
+    color: var(--color-success-text);
+    border-color: transparent;
+}
+
+.btn-done:hover {
+    opacity: 0.85;
+}
+
+/* ========== 禁用按钮样式 ========== */
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ========== 危险按钮样式 ========== */
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    color: var(--color-danger);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    transition: all 0.15s;
+}
+
+.btn-danger:hover {
+    background-color: rgba(239, 68, 68, 0.08);
+}
+
+.btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ========== 历史记录搜索 ========== */
+.history-search {
+    padding: 0 4px;
+}
+
 /* ========== 历史记录列表 ========== */
 .history-list {
     display: flex;
@@ -645,12 +757,6 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-}
-
-.history-time-label {
-    font-size: 11px;
-    color: var(--color-text-secondary);
-    padding-left: 4px;
 }
 
 /* ========== 空状态 ========== */

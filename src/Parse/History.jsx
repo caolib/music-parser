@@ -1,12 +1,18 @@
+import { useState, useMemo } from 'react'
 import MusicCard from './MusicCard.jsx'
 
-function formatTime (ts) {
-  const d = new Date(ts)
-  const pad = (n) => n.toString().padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
+export default function History ({ history, downloadPath, onBack, onClear, onDeleteRecord }) {
+  const [search, setSearch] = useState('')
 
-export default function History ({ history, downloadPath, onBack, onClear }) {
+  const filtered = useMemo(() => {
+    const keyword = search.trim().toLowerCase()
+    if (!keyword) return history
+    return history.filter(r =>
+      (r.name || '').toLowerCase().includes(keyword) ||
+      (r.artist || '').toLowerCase().includes(keyword)
+    )
+  }, [history, search])
+
   return (
     <div className='parse-page'>
       <div className='parse-container'>
@@ -26,17 +32,34 @@ export default function History ({ history, downloadPath, onBack, onClear }) {
           </div>
         </header>
 
-        {history.length === 0 ? (
+        {history.length > 0 && (
+          <div className='history-search'>
+            <input
+              className='form-input'
+              type='text'
+              placeholder='搜索歌名或歌手...'
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        )}
+
+        {filtered.length === 0 ? (
           <div className='empty-state'>
-            <p>暂无解析记录</p>
+            <p>{search.trim() ? '没有匹配的记录' : '暂无解析记录'}</p>
           </div>
         ) : (
           <div className='history-list'>
-            {history.map((record) => (
+            {filtered.map((record) => (
               <div key={record.id} className='history-card-wrapper'>
-                <div className='history-time-label'>{formatTime(record.time)}</div>
                 {record.fullData ? (
-                  <MusicCard song={record.fullData} downloadPath={downloadPath} />
+                  <MusicCard
+                    song={record.fullData}
+                    downloadPath={downloadPath}
+                    onDeleteRecord={() => onDeleteRecord(record.id)}
+                    platform={record.platform}
+                    time={record.time}
+                  />
                 ) : (
                   <div className='music-card'>
                     <div className='music-card-body'>

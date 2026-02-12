@@ -59,7 +59,7 @@ button {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #0f0f0f;
+    --color-bg: #303133;
     --color-text: #e2e8f0;
     --color-text-secondary: #64748b;
     --color-card: #1c1c1c;

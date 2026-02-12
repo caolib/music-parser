@@ -74,5 +74,17 @@ window.services = {
   // 检查目录是否存在
   dirExists (dirPath) {
     return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()
+  },
+  // 检查文件是否存在
+  fileExists (filePath) {
+    return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
+  },
+  // 删除文件（存在则删除，不存在则忽略）
+  deleteFile (filePath) {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath)
+      return true
+    }
+    return false
   }
 }

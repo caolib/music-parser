@@ -195,6 +195,12 @@ export default function Parse ({ enterAction }) {
     saveHistory([])
   }
 
+  const handleDeleteRecord = (recordId) => {
+    const updated = history.filter(r => r.id !== recordId)
+    setHistory(updated)
+    saveHistory(updated)
+  }
+
   // 设置视图
   if (view === 'settings') {
     return (
@@ -215,6 +221,7 @@ export default function Parse ({ enterAction }) {
         downloadPath={downloadPath}
         onBack={() => setView('main')}
         onClear={handleClearHistory}
+        onDeleteRecord={handleDeleteRecord}
       />
     )
   }
@@ -326,6 +333,7 @@ export default function Parse ({ enterAction }) {
                 key={song.id || idx}
                 song={song}
                 downloadPath={downloadPath}
+                platform={requestPreview?.platform || platform}
               />
             ))}
           </div>
