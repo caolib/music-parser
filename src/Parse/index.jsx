@@ -565,9 +565,12 @@ export default function Parse ({ enterAction }) {
         )}
 
         <footer className='parse-footer'>
-          <span>服务提供：<span className='link' onClick={() => openExternal('https://tunehub.sayqz.com')}>TuneHub</span></span>
+          <span>  感谢佬友 <span className='link' onClick={() => openExternal('https://linux.do/u/sayqz/summary')}>@sayqz </span>提供的</span>
+          <span>服务 <span className='link' onClick={() => openExternal('https://tunehub.sayqz.com')}>TuneHub</span></span>
           <span className='footer-sep'>·</span>
-          <span><span className='link' onClick={() => openExternal('https://linux.do/t/topic/1509257/27')}>LinuxDo 主贴</span></span>
+          <span><span className='link' onClick={() => openExternal('https://linux.do/t/topic/1509257/27')}>linuxdo 主贴</span></span>
+          <span className='footer-sep'>/</span>
+          <span>作者 <span className='link' onClick={() => openExternal('https://linux.do/u/caolib/summary')}>caolib</span></span>
         </footer>
       </div>
     </div>
