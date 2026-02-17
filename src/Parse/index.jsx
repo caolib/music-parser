@@ -86,6 +86,86 @@ function saveHistory (list) {
   try { window.utools.dbStorage.setItem(HISTORY_KEY, list) } catch { /* ignore */ }
 }
 
+function renderTemplate (value, context) {
+  if (typeof value !== 'string') return value
+
+  return value.replace(/\{\{([\s\S]*?)\}\}/g, (_, expression) => {
+    const expr = expression.trim()
+    if (!expr) return ''
+    try {
+      const evaluator = new Function('ctx', `with (ctx) { return (${expr}) }`)
+      const result = evaluator(context)
+      return result == null ? '' : String(result)
+    } catch {
+      const fallback = context[expr]
+      return fallback == null ? '' : String(fallback)
+    }
+  })
+}
+
+function resolveConfigValue (value, context) {
+  if (typeof value === 'string') return renderTemplate(value, context)
+  if (Array.isArray(value)) return value.map(item => resolveConfigValue(item, context))
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, resolveConfigValue(v, context)])
+    )
+  }
+  return value
+}
+
+function parseResponseData (rawText) {
+  try {
+    return JSON.parse(rawText)
+  } catch {
+    return rawText
+  }
+}
+
+function normalizeCoverUrl (url) {
+  if (!url || typeof url !== 'string') return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (url.startsWith('//')) return `https:${url}`
+  if (url.startsWith('/')) return `https://img4.kuwo.cn${url}`
+  return ''
+}
+
+function buildCoverMap (selectedPlatform, providerResponse) {
+  const map = {}
+
+  if (selectedPlatform === 'netease') {
+    const songs = providerResponse?.result?.songs || []
+    songs.forEach(item => {
+      const id = String(item?.id || '')
+      const cover = item?.album?.picUrl || ''
+      if (id && cover) map[id] = cover
+    })
+  }
+
+  if (selectedPlatform === 'qq') {
+    const songs = providerResponse?.req?.data?.body?.song?.list || []
+    songs.forEach(item => {
+      const id = String(item?.mid || '')
+      const albumMid = item?.album?.mid || ''
+      if (id && albumMid) {
+        map[id] = `https://y.gtimg.cn/music/photo_new/T002R300x300M000${albumMid}.jpg`
+      }
+    })
+  }
+
+  if (selectedPlatform === 'kuwo') {
+    const songs = providerResponse?.abslist || []
+    songs.forEach(item => {
+      const id = String((item?.MUSICRID || '').replace('MUSIC_', ''))
+      const rawCover = item?.web_albumpic_short || item?.web_albumpic || item?.pic || ''
+      const cover = normalizeCoverUrl(rawCover)
+      if (id && cover) map[id] = cover
+    })
+  }
+
+  return map
+}
+
 export default function Parse ({ enterAction }) {
   const [view, setView] = useState('main') // main | settings | history
   const [inputValue, setInputValue] = useState('')
@@ -96,6 +176,7 @@ export default function Parse ({ enterAction }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [songs, setSongs] = useState([])
+  const [searchResults, setSearchResults] = useState([])
   const [history, setHistory] = useState(() => loadHistory())
 
   useEffect(() => {
@@ -112,9 +193,100 @@ export default function Parse ({ enterAction }) {
     if (detected) setPlatform(detected.platform)
   }, [inputValue])
 
+  // 清空搜索结果当输入改变时
+  useEffect(() => {
+    if (searchResults.length > 0) setSearchResults([])
+  }, [inputValue])
+
   const requestPreview = useMemo(() => {
     return resolveRequestPayload(inputValue, platform)
   }, [inputValue, platform])
+
+  const handleSearch = async () => {
+    setError('')
+    setSongs([])
+    setSearchResults([])
+
+    if (!inputValue.trim()) {
+      setError('请输入搜索关键词')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const methodRes = await fetch(`https://tunehub.sayqz.com/api/v1/methods/${platform}/search`)
+      const methodData = await methodRes.json()
+
+      if (methodData.code !== 0 || !methodData.data) {
+        throw new Error(methodData.message || '不支持该平台的搜索功能')
+      }
+
+      const config = methodData.data
+      const templateContext = {
+        keyword: inputValue.trim(),
+        page: 1,
+        limit: 20,
+        pageSize: 20
+      }
+
+      let requestUrl = config.url
+      const resolvedParams = resolveConfigValue(config.params || {}, templateContext)
+      const resolvedBody = resolveConfigValue(config.body || null, templateContext)
+
+      if (config.method?.toUpperCase() === 'GET' && Object.keys(resolvedParams).length > 0) {
+        const search = new URLSearchParams()
+        Object.entries(resolvedParams).forEach(([key, value]) => {
+          search.append(key, String(value))
+        })
+        const hasQuery = requestUrl.includes('?')
+        requestUrl += `${hasQuery ? '&' : '?'}${search.toString()}`
+      }
+
+      const requestOptions = {
+        method: config.method || 'GET',
+        headers: { ...(config.headers || {}) }
+      }
+
+      if (config.method?.toUpperCase() !== 'GET' && resolvedBody) {
+        requestOptions.body = resolvedBody
+      }
+
+      const proxyRes = await window.services.request(requestUrl, requestOptions)
+      if (proxyRes.statusCode < 200 || proxyRes.statusCode >= 300) {
+        throw new Error(`搜索请求失败: ${proxyRes.statusCode}`)
+      }
+
+      const providerResponse = parseResponseData(proxyRes.data)
+      let list = []
+
+      if (config.transform) {
+        const transformFn = new Function(`return (${config.transform})`)()
+        list = transformFn(providerResponse)
+      } else if (Array.isArray(providerResponse)) {
+        list = providerResponse
+      }
+
+      if (!Array.isArray(list) || list.length === 0) {
+        setSearchResults([])
+        setError('未找到相关歌曲')
+        return
+      }
+
+      const coverMap = buildCoverMap(platform, providerResponse)
+      const normalizedList = list.map(item => ({
+        ...item,
+        cover: item?.cover || coverMap[String(item?.id || '')] || ''
+      }))
+
+      setSearchResults(normalizedList)
+    } catch (err) {
+      console.error(err)
+      setError(err.message || '搜索失败')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleParse = async () => {
     setError('')
@@ -150,7 +322,7 @@ export default function Parse ({ enterAction }) {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(`请求失败：${response.status} - ${data?.message || ''}`)
+        setError(`请求失败：${response.status}-${data?.message || ''}`)
         return
       }
 
@@ -201,6 +373,14 @@ export default function Parse ({ enterAction }) {
     saveHistory(updated)
   }
 
+  const openExternal = (url) => {
+    if (window.utools) {
+      window.utools.shellOpenExternal(url)
+    } else {
+      window.open(url, '_blank')
+    }
+  }
+
   // 设置视图
   if (view === 'settings') {
     return (
@@ -234,7 +414,6 @@ export default function Parse ({ enterAction }) {
         <header className='parse-header'>
           <div className='header-row'>
             <div>
-              <h1>歌曲解析</h1>
             </div>
             <div className='header-actions'>
               <button className='icon-btn' onClick={() => setView('history')} title='历史记录'>
@@ -256,13 +435,13 @@ export default function Parse ({ enterAction }) {
         <div className='parse-card'>
           {/* 歌曲链接/ID 输入 */}
           <div>
-            <label className='form-label'>歌曲链接或歌曲id</label>
-            <textarea
-              className='form-textarea'
-              rows={1}
+            <label className='form-label'>歌曲链接 / ID / 搜索词</label>
+            <input
+              type='text'
+              className='form-input'
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder='粘贴分享链接或输入歌曲 ID'
+              placeholder='输入歌名搜索，或粘贴分享链接/ID'
             />
           </div>
 
@@ -295,16 +474,62 @@ export default function Parse ({ enterAction }) {
                 onChange={setQuality}
               />
             </div>
-            <button
-              type='button'
-              className='btn-primary form-row-btn'
-              onClick={handleParse}
-              disabled={loading}
-            >
-              {loading && <span className='spinner' />}
-              {loading ? '解析中...' : '开始解析'}
-            </button>
+            <div className='action-buttons'>
+              <button
+                type='button'
+                className='btn-secondary form-row-btn'
+                onClick={handleSearch}
+                disabled={loading}
+                title='根据输入框内容搜索'
+              >
+                搜索
+              </button>
+              <button
+                type='button'
+                className='btn-primary form-row-btn'
+                onClick={handleParse}
+                disabled={loading}
+              >
+                {loading && <span className='spinner' />}
+                {loading ? '处理中...' : '开始解析'}
+              </button>
+            </div>
           </div>
+
+          {/* 搜索结果 */}
+          {searchResults.length > 0 && (
+            <div className='search-results-panel'>
+               <div className='panel-header'>
+                 <span className='panel-title'>搜索结果 ({searchResults.length})</span>
+                 <button className='panel-close' onClick={() => setSearchResults([])}>×</button>
+               </div>
+               <div className='search-list'>
+                 {searchResults.map((item, idx) => (
+                   <div key={item.id || idx} className='search-item' onClick={() => setInputValue(item.id)}>
+                     {item.cover && (
+                       <img
+                         className='search-cover'
+                         src={item.cover}
+                         alt={item.name || '封面'}
+                         onError={(e) => { e.currentTarget.style.display = 'none' }}
+                       />
+                     )}
+                     <div className='item-main'>
+                       <div className='item-name'>{item.name}</div>
+                       <div className='item-artist'>
+                         {item.artist}
+                         {item.album ? ` · ${item.album}` : ''}
+                       </div>
+                     </div>
+                     <button className='btn-small' onClick={(e) => {
+                       e.stopPropagation()
+                       setInputValue(item.id)
+                     }}>填入ID</button>
+                   </div>
+                 ))}
+               </div>
+            </div>
+          )}
 
           {/* 预览 + 错误信息 */}
           {(requestPreview || error) && (
@@ -325,7 +550,7 @@ export default function Parse ({ enterAction }) {
           )}
         </div>
 
-        {/* 结果展示 - 音乐卡片列表 */}
+        {/* 结果展示-音乐卡片列表 */}
         {songs.length > 0 && (
           <div className='result-wrapper'>
             {songs.map((song, idx) => (
@@ -340,9 +565,9 @@ export default function Parse ({ enterAction }) {
         )}
 
         <footer className='parse-footer'>
-          <span>服务提供：<a href='https://tunehub.sayqz.com' target='_blank' rel='noopener noreferrer'>TuneHub</a></span>
+          <span>服务提供：<span className='link' onClick={() => openExternal('https://tunehub.sayqz.com')}>TuneHub</span></span>
           <span className='footer-sep'>·</span>
-          <span><a href='https://linux.do/t/topic/1509257/27' target='_blank' rel='noopener noreferrer'>LinuxDo 主贴</a></span>
+          <span><span className='link' onClick={() => openExternal('https://linux.do/t/topic/1509257/27')}>LinuxDo 主贴</span></span>
         </footer>
       </div>
     </div>

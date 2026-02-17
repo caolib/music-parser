@@ -4,14 +4,21 @@
     background-color: var(--color-bg);
     color: var(--color-text);
     padding: 16px;
+    padding-top: 6px;
     transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .parse-container {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 6px;
+    flex: 1;
+    /* 让容器填满剩余空间 */
+    width: 100%;
 }
 
 /* ========== 头部 ========== */
@@ -773,18 +780,221 @@
     padding: 12px 0;
     font-size: 12px;
     color: var(--color-text-secondary);
+    margin-top: auto;
+    /* 固定在底部 */
 }
 
-.parse-footer a {
+.parse-footer .link {
     color: var(--color-primary);
     text-decoration: none;
+    cursor: pointer;
 }
 
-.parse-footer a:hover {
+.parse-footer .link:hover {
     text-decoration: underline;
 }
 
 .footer-sep {
     margin: 0 6px;
     opacity: 0.5;
+}
+
+/* ========== Tabs ========== */
+.tabs {
+    display: flex;
+    background-color: var(--input-bg);
+    padding: 4px;
+    border-radius: 10px;
+    margin-top: 16px;
+    gap: 4px;
+}
+
+.tab-item {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.tab-item:hover {
+    color: var(--text-color);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tab-item.active {
+    background-color: var(--card-bg);
+    color: var(--primary-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+    .tab-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* ========== 本地文件 ========== */
+.local-tag {
+    background-color: var(--text-secondary);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.local-cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--input-bg);
+    color: var(--text-secondary);
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+.local-cover svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ========== 搜索按钮区域 ========== */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 42px;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-border);
+    color: var(--color-text);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ========== 搜索结果面板 ========== */
+.search-results-panel {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background-color: var(--color-card);
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.search-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: var(--color-input-bg);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-item:hover {
+    background-color: var(--color-border);
+}
+
+.search-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-right: 10px;
+    border: 1px solid var(--color-border);
+}
+
+.item-main {
+    flex: 1;
+    min-width: 0;
+    margin-right: 12px;
+}
+
+.item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-artist {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

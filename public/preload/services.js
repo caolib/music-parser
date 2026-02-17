@@ -2,21 +2,63 @@ const fs = require('node:fs')
 const path = require('node:path')
 const http = require('node:http')
 const https = require('node:https')
+const { URL } = require('node:url')
 
 // 通过 window 对象向渲染进程注入 nodejs 能力
 window.services = {
+  // 发起 HTTP 请求（绕过 CORS）
+  request(url, options = {}) {
+    return new Promise((resolve, reject) => {
+      try {
+        const urlObj = new URL(url)
+        const client = urlObj.protocol === 'https:' ? https : http
+        const headers = options.headers || {}
+
+        const reqOpts = {
+          method: options.method || 'GET',
+          headers: headers,
+        }
+
+        const req = client.request(url, reqOpts, (res) => {
+          let data = []
+          res.on('data', (chunk) => data.push(chunk))
+          res.on('end', () => {
+            const buffer = Buffer.concat(data)
+            // 尝试猜测编码或直接返回文本
+            const text = buffer.toString()
+            resolve({
+              statusCode: res.statusCode,
+              headers: res.headers,
+              data: text,
+              raw: buffer // 也可以传回 buffer 如果需要处理二进制，但 preload 传不过去 full buffer 对象给 render 除非序列化
+            })
+          })
+        })
+
+        req.on('error', reject)
+
+        if (options.body) {
+          req.write(typeof options.body === 'string' ? options.body : JSON.stringify(options.body))
+        }
+        req.end()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  },
+
   // 读文件
-  readFile (file) {
+  readFile(file) {
     return fs.readFileSync(file, { encoding: 'utf-8' })
   },
   // 文本写入到下载目录
-  writeTextFile (text) {
+  writeTextFile(text) {
     const filePath = path.join(window.utools.getPath('downloads'), Date.now().toString() + '.txt')
     fs.writeFileSync(filePath, text, { encoding: 'utf-8' })
     return filePath
   },
   // 图片写入到下载目录
-  writeImageFile (base64Url) {
+  writeImageFile(base64Url) {
     const matchs = /^data:image\/([a-z]{1,20});base64,/i.exec(base64Url)
     if (!matchs) return
     const filePath = path.join(window.utools.getPath('downloads'), Date.now().toString() + '.' + matchs[1])
@@ -24,7 +66,7 @@ window.services = {
     return filePath
   },
   // 写文本到指定路径
-  writeTextToPath (text, savePath) {
+  writeTextToPath(text, savePath) {
     const dir = path.dirname(savePath)
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true })
@@ -33,7 +75,7 @@ window.services = {
     return savePath
   },
   // 下载文件到指定路径（返回 Promise）
-  downloadFile (url, savePath) {
+  downloadFile(url, savePath) {
     return new Promise((resolve, reject) => {
       const dir = path.dirname(savePath)
       if (!fs.existsSync(dir)) {
@@ -57,34 +99,90 @@ window.services = {
           resolve(savePath)
         })
         fileStream.on('error', (err) => {
-          fs.unlink(savePath, () => {})
+          fs.unlink(savePath, () => { })
           reject(err)
         })
       }).on('error', reject)
     })
   },
   // 暴露 path.join
-  pathJoin (...args) {
+  pathJoin(...args) {
     return path.join(...args)
   },
   // 获取默认下载目录
-  getDownloadsPath () {
+  getDownloadsPath() {
     return window.utools.getPath('downloads')
   },
   // 检查目录是否存在
-  dirExists (dirPath) {
+  dirExists(dirPath) {
     return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()
   },
   // 检查文件是否存在
-  fileExists (filePath) {
+  fileExists(filePath) {
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile()
   },
   // 删除文件（存在则删除，不存在则忽略）
-  deleteFile (filePath) {
+  deleteFile(filePath) {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath)
       return true
     }
     return false
+  },
+  // 获取下载目录的音频文件
+  // 获取下载目录的音频文件
+  listAudioFiles(customDownloadPath) {
+    // 优先使用传入的自定义路径，否则使用默认下载路径
+    const downloadPath = customDownloadPath || window.utools.getPath('downloads')
+    if (!fs.existsSync(downloadPath)) return []
+
+    const files = fs.readdirSync(downloadPath)
+    // 常见音频格式
+    const audioExtensions = ['.mp3', '.flac', '.wav', '.m4a', '.ogg', '.aac']
+
+    return files
+      .filter(file => audioExtensions.includes(path.extname(file).toLowerCase()))
+      .map(file => {
+        const fullPath = path.join(downloadPath, file)
+        try {
+          const stats = fs.statSync(fullPath)
+          if (!stats.isFile()) return null
+
+          const nameKeywords = path.basename(file, path.extname(file))
+          let artist = '未知歌手'
+          let name = nameKeywords
+
+          // 尝试解析 "歌手 - 歌名" (带空格)
+          if (nameKeywords.includes(' - ')) {
+            const parts = nameKeywords.split(' - ')
+            artist = parts[0].trim()
+            name = parts.slice(1).join(' - ').trim()
+          }
+          // 尝试解析 "歌手-歌名" (无空格)
+          else if (nameKeywords.includes('-')) {
+            const parts = nameKeywords.split('-')
+            if (parts.length >= 2) {
+              artist = parts[0].trim()
+              name = parts.slice(1).join('-').trim()
+            }
+          }
+
+          return {
+            id: 'local_' + file,
+            name: name,
+            artist: artist,
+            url: 'file://' + fullPath,
+            album: '本地下载',
+            platform: 'local',
+            filePath: fullPath,
+            size: stats.size,
+            time: stats.mtimeMs
+          }
+        } catch (e) {
+          return null
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.time - a.time)
   }
 }

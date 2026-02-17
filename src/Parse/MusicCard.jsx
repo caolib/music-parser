@@ -70,7 +70,7 @@ export default function MusicCard ({ song, downloadPath, onDeleteRecord, platfor
   const songUrl = getSongUrl(platform, song.id)
 
   // 计算各文件路径
-  const baseName = info ? sanitizeFileName(`${info.artist} - ${info.name}`) : ''
+  const baseName = info ? sanitizeFileName(`${info.artist}-${info.name}`) : ''
   const musicExt = getExtByQuality(actualQuality)
   const musicPath = baseName ? window.services.pathJoin(downloadPath, `${baseName}.${musicExt}`) : ''
   const lrcPath = baseName ? window.services.pathJoin(downloadPath, `${baseName}.lrc`) : ''
